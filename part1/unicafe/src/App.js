@@ -19,6 +19,20 @@ const Percentage = ({good, all}) => {
   }
 }
 
+const Statistics = ({good, neutral, bad}) => {
+  const all = good + neutral + bad
+  return (
+    <div>
+      <p>good: {good} </p>
+      <p>neutral: {neutral} </p>
+      <p>bad: {bad} </p>
+      <p>all: {all} </p>
+      <Score good={good} neutral={neutral} bad={bad} />
+      <Percentage good={good} all={all} />
+    </div>
+  )
+}
+
 
 const App = () => {
   // save clicks of each button to its own state
@@ -37,12 +51,7 @@ const App = () => {
       <Button handleClick={addFeedback(neutral, setNeutral)} text="neutral" />
       <Button handleClick={addFeedback(bad, setBad)} text="bad" />
       <Header text="Statistics" />
-      <p>good: {good} </p>
-      <p>neutral: {neutral} </p>
-      <p>bad: {bad} </p>
-      <p>all: {good + neutral + bad} </p>
-      <Score good={good} neutral={neutral} bad={bad} />
-      <Percentage good={good} all={good + neutral + bad} />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
