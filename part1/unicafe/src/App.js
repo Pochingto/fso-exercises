@@ -2,22 +2,10 @@ import { useState } from 'react'
 
 const Header = ({text}) => <h1> {text} </h1>
 const Button = ({handleClick, text}) => (<button onClick={handleClick}> {text} </button>)
-const Score = ({good, neutral, bad}) => {
-  let all = good + neutral + bad
-  let score = 0
-  if (all != 0) {
-    score = (good - bad) / all
-  }
 
-  return <p>score: {score}</p>
-}
-const Percentage = ({good, all}) => {
-  if (all == 0) {
-    return <p>positive 0% </p>
-  }else {
-    return <p>positive {good / all * 100}% </p>
-  }
-}
+const StatisticsLine = ({name, stat}) => <p>{name}: {stat}</p>
+const calculateScore = (good, neutral, bad) => (good - bad) / (good + neutral + bad)
+const calculatePercentage = (good, all) => (good / all * 100)
 
 const Statistics = ({good, neutral, bad}) => {
   const all = good + neutral + bad
@@ -25,19 +13,17 @@ const Statistics = ({good, neutral, bad}) => {
     return <p>No feedback given.</p>
   }
 
-  
   return (
     <div>
-      <p>good: {good} </p>
-      <p>neutral: {neutral} </p>
-      <p>bad: {bad} </p>
-      <p>all: {all} </p>
-      <Score good={good} neutral={neutral} bad={bad} />
-      <Percentage good={good} all={all} />
+      <StatisticsLine name="good" stat={good} />
+      <StatisticsLine name="neutral" stat={neutral} />
+      <StatisticsLine name="bad" stat={bad} />
+      <StatisticsLine name="all" stat={all} />
+      <StatisticsLine name="score" stat={calculateScore(good, neutral, bad)} />
+      <StatisticsLine name="positive percentage" stat={calculatePercentage(good, all)} />
     </div>
   )
 }
-
 
 const App = () => {
   // save clicks of each button to its own state
