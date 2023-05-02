@@ -2,6 +2,23 @@ import { useState } from 'react'
 
 const Header = ({text}) => <h1> {text} </h1>
 const Button = ({handleClick, text}) => (<button onClick={handleClick}> {text} </button>)
+const Score = ({good, neutral, bad}) => {
+  let all = good + neutral + bad
+  let score = 0
+  if (all != 0) {
+    score = (good - bad) / all
+  }
+
+  return <p>score: {score}</p>
+}
+const Percentage = ({good, all}) => {
+  if (all == 0) {
+    return <p>positive 0% </p>
+  }else {
+    return <p>positive {good / all * 100}% </p>
+  }
+}
+
 
 const App = () => {
   // save clicks of each button to its own state
@@ -23,6 +40,9 @@ const App = () => {
       <p>good: {good} </p>
       <p>neutral: {neutral} </p>
       <p>bad: {bad} </p>
+      <p>all: {good + neutral + bad} </p>
+      <Score good={good} neutral={neutral} bad={bad} />
+      <Percentage good={good} all={good + neutral + bad} />
     </div>
   )
 }
