@@ -7,6 +7,12 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const addPerson = (event) => {
     event.preventDefault()
+    const duplicate = persons.find(person => person.name === newName)
+    if (duplicate !== undefined) {
+      alert(`${duplicate.name} is already in the list!`)
+      return
+    }
+
     setPersons(persons.concat({
       name: newName
     }))
