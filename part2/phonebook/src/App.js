@@ -1,27 +1,10 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 
-const Filter = ({filterName, setFilteredName}) => (
-  <input value={filterName} onChange={(event) => setFilteredName(event.target.value)}/>
-)
+import Filter from './components/Filter'
+import People from './components/People'
+import PersonForm from './components/PersonFrom'
 
-const Persons = ({filteredPerson}) => (
-  filteredPerson.map((person) => <div key={person.name}>{person.name} {person.number}</div>)
-)
-
-const PersonForm = ({addPerson, newName, changeNewName, newNumber, changeNewNumber}) => {
-  return <form onSubmit={addPerson}>
-    <div>
-      name: <input value={newName} onChange={changeNewName}/>
-    </div>
-    <div>
-      number: <input value={newNumber} onChange={changeNewNumber}/>
-    </div>
-    <div>
-      <button type="submit">add</button>
-    </div>
-  </form>
-}
+import personService from './services/person'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -30,11 +13,7 @@ const App = () => {
   const [filterName, setFilteredName] = useState('')
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:3001/persons`)
-      .then((response) => {
-        setPersons(response.data)
-      })
+    personService.getAll().then(data => setPersons(data))
   }, [])
 
   const addPerson = (event) => {
@@ -45,14 +24,13 @@ const App = () => {
       return
     }
 
-    axios
-      .post(`http://localhost:3001/persons`, {
+    personService.add({
         name: newName, 
         number: newNumber
       })
-      .then((response) => {
+      .then((person) => {
         setPersons(
-          persons.concat(response.data)
+          persons.concat(person)
         )
       })
     setNewName("")
@@ -73,7 +51,7 @@ const App = () => {
       changeNewName={(event) => setNewName(event.target.value)} 
       changeNewNumber={(event) => setNewNumber(event.target.value)}/>
       <h2>Numbers</h2>
-      <Persons filteredPerson={filteredPerson}/>
+      <People filteredPerson={filteredPerson}/>
     </div>
   )
 }
