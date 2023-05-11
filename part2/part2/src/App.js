@@ -1,6 +1,7 @@
 import Note from './components/Note'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import noteService from './services/notes'
 
 const App = () => {
   const [notes, setNotes] = useState([])
@@ -9,12 +10,7 @@ const App = () => {
 
  const hook = () => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/notes')
-      .then(response => {
-        console.log('promise fulfilled')
-        setNotes(response.data)
-      })
+    noteService.getAll().then(notes => setNotes(notes))
   }
   useEffect(hook, [])
   console.log('render', notes.length, 'notes')
@@ -22,12 +18,30 @@ const App = () => {
   const addNote = (event) => {
     event.preventDefault()
     console.log("clicked...", event.target)
-    setNotes(notes.concat({
-      id: notes.length + 1,
+
+    const noteObject = {
       content: newNote,
-      important: Math.random() < 0.5,
-    }))
+      important: Math.random() < 0.5
+    }
+    noteService.create(noteObject)
+      .then((note) => setNotes(notes.concat(note)))
     setNewNote('')
+  }
+  const toggleImportanceOf = (id) => {
+    console.log(`toggling ${id} importance`)
+    const note = notes.find( (note) => note.id === id)
+    const changedNote = {...note, important:!note.important}
+
+    noteService.update(changedNote, id)
+      .then( (updatedNote) => {
+        console.log("returned udpated note")
+        const newNotes = notes.map((note) => note.id !== id? note: updatedNote)
+        setNotes(newNotes)
+      })
+      .catch(error => {
+        alert(`${id} has already been deleted from the server.`)
+        setNotes(notes.filter(note => note.id !== id))
+      })
   }
   const handleNoteChange = (event) => {
     console.log(event.target.value)
@@ -46,7 +60,7 @@ const App = () => {
       <ul>
         <ul>
           {noteToShow.map(note => 
-            <Note key={note.id} note={note} />
+            <Note key={note.id} note={note} toggleImportanceOf={() => toggleImportanceOf(note.id)}/>
           )}
         </ul>
       </ul>

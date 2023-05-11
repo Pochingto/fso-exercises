@@ -1,19 +1,94 @@
 {
-    "notes": [
-      {
-        "id": 1,
-        "content": "HTML is easy",
-        "important": true
-      },
-      {
-        "id": 2,
-        "content": "Browser can execute only JavaScript",
-        "important": false
-      },
-      {
-        "id": 3,
-        "content": "GET and POST are the most important methods of HTTP protocol",
-        "important": true
-      }
-    ]
+  "notes": [
+    {
+      "id": 1,
+      "content": "HTML is easy",
+      "important": false
+    },
+    {
+      "id": 2,
+      "content": "Browser can execute only JavaScript",
+      "important": false
+    },
+    {
+      "id": 3,
+      "content": "GET and POST are the most important methods of HTTP protocol",
+      "important": true
+    },
+    {
+      "content": "add new note...",
+      "important": false,
+      "id": 4
+    },
+    {
+      "content": "hry",
+      "important": false,
+      "id": 5
+    },
+    {
+      "content": "why",
+      "important": false,
+      "id": 6
+    },
+    {
+      "content": "ohmygod",
+      "important": false,
+      "id": 7
+    },
+    {
+      "content": "nothingisimportant",
+      "important": true,
+      "id": 8
+    },
+    {
+      "content": "add new note...",
+      "important": true,
+      "id": 9
+    },
+    {
+      "content": "add new note...2",
+      "important": false,
+      "id": 10
+    },
+    {
+      "content": "add new note...3",
+      "important": true,
+      "id": 11
+    },
+    {
+      "content": "add new note...4",
+      "important": false,
+      "id": 12
+    },
+    {
+      "content": "555",
+      "important": true,
+      "id": 13
+    },
+    {
+      "content": "add new note...",
+      "important": true,
+      "id": 14
+    },
+    {
+      "content": "new 5",
+      "important": true,
+      "id": 15
+    },
+    {
+      "content": "new0",
+      "important": true,
+      "id": 16
+    },
+    {
+      "content": "new1",
+      "important": true,
+      "id": 17
+    },
+    {
+      "content": "new2",
+      "important": false,
+      "id": 18
+    }
+  ]
 }
