@@ -20,15 +20,17 @@ const App = () => {
     event.preventDefault()
     const duplicate = persons.find(person => person.name === newName)
     if (duplicate !== undefined) {
-      personService.update({
-        ...duplicate,
-        number: newNumber
-      })
-      .then((person) => {
-        setPersons(
-          persons.map(p => p.id === person.id ? person : p)
-        )
-      })
+      if (window.confirm(`${duplicate.name} is already in the phone book, update it with new number?`)) {
+        personService.update({
+          ...duplicate,
+          number: newNumber
+        })
+        .then((person) => {
+          setPersons(
+            persons.map(p => p.id === person.id ? person : p)
+          )
+        })
+      }
     }else {
       personService.add({
         name: newName, 
