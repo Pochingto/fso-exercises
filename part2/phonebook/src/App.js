@@ -20,11 +20,17 @@ const App = () => {
     event.preventDefault()
     const duplicate = persons.find(person => person.name === newName)
     if (duplicate !== undefined) {
-      alert(`${duplicate.name} is already in the list!`)
-      return
-    }
-
-    personService.add({
+      personService.update({
+        ...duplicate,
+        number: newNumber
+      })
+      .then((person) => {
+        setPersons(
+          persons.map(p => p.id === person.id ? person : p)
+        )
+      })
+    }else {
+      personService.add({
         name: newName, 
         number: newNumber
       })
@@ -33,6 +39,7 @@ const App = () => {
           persons.concat(person)
         )
       })
+    }
     setNewName("")
     setNewNumber("")
   }

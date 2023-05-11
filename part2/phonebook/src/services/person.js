@@ -19,4 +19,10 @@ const remove = (id) => (
         .delete(baseURL + "/" + `${id}`)
 )
 
-export default {getAll, add, remove}
+const update = (person) => (
+    axios
+        .put(baseURL + "/" + `${person.id}`, person)
+        .then(response => response.data)
+)
+
+export default {getAll, add, update, remove}
