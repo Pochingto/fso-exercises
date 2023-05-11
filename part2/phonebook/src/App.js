@@ -1,5 +1,27 @@
 import { useState } from 'react'
 
+const Filter = ({filterName, setFilteredName}) => (
+  <input value={filterName} onChange={(event) => setFilteredName(event.target.value)}/>
+)
+
+const Persons = ({filteredPerson}) => (
+  filteredPerson.map((person) => <div key={person.name}>{person.name} {person.number}</div>)
+)
+
+const PersonForm = ({addPerson, newName, changeNewName, newNumber, changeNewNumber}) => {
+  return <form onSubmit={addPerson}>
+    <div>
+      name: <input value={newName} onChange={changeNewName}/>
+    </div>
+    <div>
+      number: <input value={newNumber} onChange={changeNewNumber}/>
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas',
@@ -33,21 +55,14 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      filter shown with: <input value={filterName} onChange={(event) => setFilteredName(event.target.value)}/>
+      filter shown with: <Filter filterName={filterName} setFilteredName={setFilteredName} />
       <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={(event) => setNewName(event.target.value)}/>
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={(event) => setNewNumber(event.target.value)}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm addPerson={addPerson} 
+      newName={newName} newNumber={newNumber}
+      changeNewName={(event) => setNewName(event.target.value)} 
+      changeNewNumber={(event) => setNewNumber(event.target.value)}/>
       <h2>Numbers</h2>
-      {filteredPerson.map((person) => <div key={person.name}>{person.name} {person.number}</div>)}
+      <Persons filteredPerson={filteredPerson}/>
     </div>
   )
 }
