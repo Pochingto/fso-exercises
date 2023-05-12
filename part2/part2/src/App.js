@@ -3,17 +3,45 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import noteService from './services/notes'
 
+const Footer = () => {
+  const footerStyle = {
+    color: "green",
+    fontStyle: "italic",
+    fontSize: 16
+  }
+
+  return (
+    <div style={footerStyle}>
+      <br/>
+      <em>Hello, this is Footer </em>
+    </div>
+  )
+}
+
+const Notification = ({message}) => {
+  if (message === null) {
+    return null;
+  }
+
+  return (
+  <div className="error">
+    {message}
+  </div>
+  )
+}
+
 const App = () => {
-  const [notes, setNotes] = useState([])
+  const [notes, setNotes] = useState(null)
   const [newNote, setNewNote] = useState("add new note...")
   const [showAll, setShowAll] = useState(true)
+  const [errorMessage, setErrorMessage] = useState(null)
 
  const hook = () => {
     console.log('effect')
     noteService.getAll().then(notes => setNotes(notes))
   }
   useEffect(hook, [])
-  console.log('render', notes.length, 'notes')
+  // console.log('render', notes.length, 'notes')
   
   const addNote = (event) => {
     event.preventDefault()
@@ -39,7 +67,10 @@ const App = () => {
         setNotes(newNotes)
       })
       .catch(error => {
-        alert(`${id} has already been deleted from the server.`)
+        setErrorMessage(`${id} has already been deleted from the server.`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000);
         setNotes(notes.filter(note => note.id !== id))
       })
   }
@@ -48,10 +79,14 @@ const App = () => {
     setNewNote(event.target.value)
   }
 
+  if (!notes)
+    return null
+
   const noteToShow = showAll ? notes : notes.filter(note => note.important)
   return (
     <div>
       <h1>Notes</h1>
+      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? "important" : "all"}
@@ -68,6 +103,7 @@ const App = () => {
         <input value={newNote} onChange={handleNoteChange}/>
         <button type='submit'> save </button>
       </form>
+      <Footer />
     </div>
   )
 }
