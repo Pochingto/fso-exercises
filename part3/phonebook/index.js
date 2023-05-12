@@ -55,6 +55,13 @@ app.get("/api/persons/:id", (request, response) => {
 app.post("/api/persons", (request, response) => {
   const body = request.body
   if (body.name && body.number) {
+    const duplicate = persons.find(person => person.name === body.name)
+    if (duplicate) {
+      return response.status(400).json({
+        error: `Name ${body.name} already exist`
+      })
+    }
+
     const newPerson = {
       id: generateID(),
       name: body.name, 
@@ -63,7 +70,9 @@ app.post("/api/persons", (request, response) => {
     persons = persons.concat(newPerson)
     response.json(newPerson)
   }else {
-    response.status(400).end()
+    response.status(400).json({
+      error: "name or number missing"
+    })
   }
 })
 
