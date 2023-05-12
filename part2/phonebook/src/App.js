@@ -12,8 +12,13 @@ const Notification = ({message}) => {
     return null
   }
 
+  let color = "green"
+  if (message.startsWith("ERROR")) {
+    color = "red"
+  }
+
   const notiStyle = {
-    color: "green",
+    color: color,
     background: "lightgrey",
     fontSize: 20,
     borderStyle: "solid",
@@ -52,10 +57,14 @@ const App = () => {
           setPersons(
             persons.map(p => p.id === person.id ? person : p)
           )
+          setNotification(`Updated ${duplicate.name} phone number.`)
+          setTimeout(() => setNotification(null), 5000)
         })
-
-        setNotification(`Updated ${duplicate.name} phone number.`)
-        setTimeout(() => setNotification(null), 5000)
+        .catch((error) => {
+          console.log(`ERROR: ${duplicate.name} is already deleted`)
+          setNotification(`ERROR: ${duplicate.name} is already deleted.`)
+          setTimeout(() => setNotification(null), 5000)
+        })
       }
     }else {
       personService.add({
