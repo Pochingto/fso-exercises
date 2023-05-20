@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 const app = express()
 
@@ -21,8 +22,9 @@ const logger = morgan((tokens, req, res) => {
   ].join(' ')
 })
 
-app.use(logger)
+app.use(cors())
 app.use(express.json())
+app.use(logger)
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
