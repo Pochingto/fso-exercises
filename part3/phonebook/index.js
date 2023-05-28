@@ -94,20 +94,6 @@ app.get("/api/persons/:id", (request, response, next) => {
 app.post("/api/persons", (request, response, next) => {
   const body = request.body
   if (body.name && body.number) {
-    // const duplicate = persons.find(person => person.name === body.name)
-    // if (duplicate) {
-    //   return response.status(400).json({
-    //     error: `Name ${body.name} already exist`
-    //   })
-    // }
-
-    // const newPerson = {
-    //   id: generateID(),
-    //   name: body.name, 
-    //   number: body.number 
-    // }
-    // persons = persons.concat(newPerson)
-    // response.json(newPerson)
     const newPerson = new Person({
       name: body.name,
       number: body.number
@@ -120,6 +106,18 @@ app.post("/api/persons", (request, response, next) => {
       error: "name or number missing"
     })
   }
+})
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const id = request.params.id
+  const body = request.body
+  const updatedPerson = {
+    name: body.name,
+    number: body.number
+  }
+  Person.findByIdAndUpdate(id, updatedPerson, {new: true})
+    .then(result => response.json(result))
+    .catch(error => next(error))
 })
 
 app.delete("/api/persons/:id", (request, response, next) => {
