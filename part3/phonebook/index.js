@@ -34,33 +34,6 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
-let persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
-const generateID = () => {
-  return Math.floor(Math.random() * 100000000);
-}
-
 app.get("/api/persons", (request, response, next) => {
     // response.json(persons)
     Person.find({})
@@ -71,11 +44,14 @@ app.get("/api/persons", (request, response, next) => {
 })
 
 app.get("/api/info", (request, response) => {
-  const date = new Date()
-  response.send(
-    `<p>Phonebook has info for ${persons.length} people.</p>
-    <p>${date.toString()}</p>`
-  )
+   Person.find({})
+    .then(persons => {
+      const date = new Date()
+      response.send(
+        `<p>Phonebook has info for ${persons.length} people.</p>
+        <p>${date.toString()}</p>`
+      )
+    })
 })
 
 app.get("/api/persons/:id", (request, response, next) => {
