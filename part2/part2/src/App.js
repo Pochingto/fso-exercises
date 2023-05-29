@@ -52,7 +52,16 @@ const App = () => {
       important: Math.random() < 0.5
     }
     noteService.create(noteObject)
-      .then((note) => setNotes(notes.concat(note)))
+      .then((note) => {
+        console.log(note)
+        setNotes(notes.concat(note))
+      }).catch(error => {
+        console.log("caugth by frontend")
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000);
+      })
     setNewNote('')
   }
   const toggleImportanceOf = (id) => {

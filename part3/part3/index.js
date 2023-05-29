@@ -13,38 +13,20 @@ const requestLogger = (request, response, next) => {
 }
 
 const app = express()
-console.log("starting server...")
+console.log('starting server...')
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
 app.use(requestLogger)
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true
-  }
-]
-
-app.get("/", (request, response) => {
-    response.send("<h1>Hello world!</h1>")
+app.get('/', (request, response) => {
+    response.send('<h1>Hello world!</h1>')
 })
 
-app.get("/api/notes", (request, response) => {
+app.get('/api/notes', (request, response) => {
     // response.json(notes)
     Note.find({}).then(result => {
-        console.log("getAll result: ", result)
+        console.log('getAll result: ', result)
         response.json(result)
     })
 })
@@ -52,7 +34,7 @@ app.get("/api/notes", (request, response) => {
 app.get('/api/notes/:id', (request, response, next) => {
     Note.findById(request.params.id)
         .then((note) => {
-            console.log("note: ", note)
+            console.log('note: ', note)
             if (note) {
                 response.json(note)
             }else {
@@ -62,20 +44,16 @@ app.get('/api/notes/:id', (request, response, next) => {
         .catch((error) => next(error))
 })
 
-const generateId = (notes) => {
-    return notes.length > 0 ? Math.max(...notes.map(note => note.id)) + 1: 0
-}
-
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
     if (!request.body.content) {
         return response.status(400).json({
-            error: "content missing!"
+            error: 'content missing!'
         })
     }
 
-    const note = request.body
-    console.log(note)
-    console.log(generateId(notes))
+    // const note = request.body
+    // console.log(note)
+    // console.log(generateId(notes))
     
     // const newNote = {
     //     id: generateId(notes), 
@@ -92,6 +70,7 @@ app.post('/api/notes', (request, response) => {
             console.log(savedNote)
             response.json(savedNote)
         })
+        .catch(error => next(error))
 })
 
 app.put('/api/notes/:id', (request, response, next) => {
@@ -101,7 +80,11 @@ app.put('/api/notes/:id', (request, response, next) => {
         content: newNote.content, 
         important: newNote.important || false
     }
-    Note.findByIdAndUpdate(id, updatedNote, {new: true})
+    Note.findByIdAndUpdate(id, updatedNote, {
+        new: true, 
+        runValidators: true,
+        context: 'query'
+    })
         .then(note => response.json(note))
         .catch(error => next(error))
 })
@@ -114,16 +97,19 @@ app.delete('/api/notes/:id', (request, response, next) => {
 })
 
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({error: "unknown endpoint"})
+    response.status(404).send({error: 'unknown endpoint'})
 }
 
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-    console.log("error message: ", error.message)
+    console.log('error name: ', error.name)
+    console.log('error message: ', error.message)
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
-    } 
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).send({error: error.message})
+    }
     next(error)
 }
 
