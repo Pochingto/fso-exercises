@@ -91,7 +91,9 @@ app.put("/api/persons/:id", (request, response, next) => {
     name: body.name,
     number: body.number
   }
-  Person.findByIdAndUpdate(id, updatedPerson, {new: true})
+  Person.findByIdAndUpdate(id, updatedPerson, 
+    {new: true, runValidators: true, context: 'query'}
+  )
     .then(result => response.json(result))
     .catch(error => next(error))
 })
@@ -113,6 +115,10 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === "CastError") {
     response.status(400).send({
       "message": "invalid id"
+    })
+  }else if (error.name === 'ValidationError') {
+    response.status(400).send({
+      "error": error.message
     })
   }
   next(error)

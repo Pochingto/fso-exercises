@@ -72,9 +72,15 @@ const App = () => {
         number: newNumber
       })
       .then((person) => {
+        // console.log(person)
         setPersons(
           persons.concat(person)
         )
+      })
+      .catch((error) => {
+        // console.log(error)
+        setNotification(`ERROR: ${error.response.data.error}`)
+        setTimeout(() => setNotification(null), 5000)
       })
 
       setNotification(`Added ${newName} phone number.`)
