@@ -118,7 +118,7 @@ const errorHandler = (error, request, response, next) => {
     })
   }else if (error.name === 'ValidationError') {
     response.status(400).send({
-      "error": error.message
+      "message": error.message
     })
   }
   next(error)

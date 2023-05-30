@@ -61,8 +61,10 @@ const App = () => {
           setTimeout(() => setNotification(null), 5000)
         })
         .catch((error) => {
-          console.log(`ERROR: ${duplicate.name} is already deleted`)
-          setNotification(`ERROR: ${duplicate.name} is already deleted.`)
+          // console.log(`ERROR: ${duplicate.name} is already deleted`)
+          // setNotification(`ERROR: ${duplicate.name} is already deleted.`)
+          console.log(`ERROR: ${error.response.data.message}`)
+          setNotification(`ERROR: ${error.response.data.message}`)
           setTimeout(() => setNotification(null), 5000)
         })
       }
@@ -79,7 +81,7 @@ const App = () => {
       })
       .catch((error) => {
         // console.log(error)
-        setNotification(`ERROR: ${error.response.data.error}`)
+        setNotification(`ERROR: ${error.response.data.message}`)
         setTimeout(() => setNotification(null), 5000)
       })
 
