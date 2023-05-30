@@ -6,22 +6,22 @@ const Person = require('./models/person')
 
 const app = express()
 
-morgan.token("content", (req, res) => {
-  if (req.method === "POST") {
-    return JSON.stringify(req.body)
-  }else {
-    return null
-  }
+morgan.token('content', (req, _res) => {
+    if (req.method === 'POST') {
+        return JSON.stringify(req.body)
+    }else {
+        return null
+    }
 })
 const logger = morgan((tokens, req, res) => {
-  return [
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    tokens.res(req, res, 'content-length'), '-',
-    tokens['response-time'](req, res), 'ms',
-    tokens.content(req, res)
-  ].join(' ')
+    return [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms',
+        tokens.content(req, res)
+    ].join(' ')
 })
 
 app.use(cors())
@@ -30,98 +30,98 @@ app.use(logger)
 
 app.use(express.static('build'))
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (_request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
 }
 
-app.get("/api/persons", (request, response, next) => {
+app.get('/api/persons', (_request, response, next) => {
     // response.json(persons)
     Person.find({})
-      .then(result => {
-        response.json(result)
-      })
-      .catch(error => next(error))
+        .then(result => {
+            response.json(result)
+        })
+        .catch(error => next(error))
 })
 
-app.get("/api/info", (request, response) => {
-   Person.find({})
-    .then(persons => {
-      const date = new Date()
-      response.send(
-        `<p>Phonebook has info for ${persons.length} people.</p>
+app.get('/api/info', (_request, response) => {
+    Person.find({})
+        .then(persons => {
+            const date = new Date()
+            response.send(
+                `<p>Phonebook has info for ${persons.length} people.</p>
         <p>${date.toString()}</p>`
-      )
-    })
+            )
+        })
 })
 
-app.get("/api/persons/:id", (request, response, next) => {
-  const id = request.params.id
-  // const person = persons.find(p => p.id === id)
-  // if (person) {
-  //   response.json(person)
-  // }else {
-  //   response.status(404).end()
-  // }
-  Person.findById(id)
-    .then(result => response.json(result))
-    .catch(error => next(error))
+app.get('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+    // const person = persons.find(p => p.id === id)
+    // if (person) {
+    //   response.json(person)
+    // }else {
+    //   response.status(404).end()
+    // }
+    Person.findById(id)
+        .then(result => response.json(result))
+        .catch(error => next(error))
 })
 
-app.post("/api/persons", (request, response, next) => {
-  const body = request.body
-  if (body.name && body.number) {
-    const newPerson = new Person({
-      name: body.name,
-      number: body.number
-    })
-    newPerson.save()
-      .then(result => response.json(result))
-      .catch(error => next(error))
-  }else {
-    response.status(400).json({
-      error: "name or number missing"
-    })
-  }
+app.post('/api/persons', (request, response, next) => {
+    const body = request.body
+    if (body.name && body.number) {
+        const newPerson = new Person({
+            name: body.name,
+            number: body.number
+        })
+        newPerson.save()
+            .then(result => response.json(result))
+            .catch(error => next(error))
+    }else {
+        response.status(400).json({
+            error: 'name or number missing'
+        })
+    }
 })
 
-app.put("/api/persons/:id", (request, response, next) => {
-  const id = request.params.id
-  const body = request.body
-  const updatedPerson = {
-    name: body.name,
-    number: body.number
-  }
-  Person.findByIdAndUpdate(id, updatedPerson, 
-    {new: true, runValidators: true, context: 'query'}
-  )
-    .then(result => response.json(result))
-    .catch(error => next(error))
+app.put('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+    const body = request.body
+    const updatedPerson = {
+        name: body.name,
+        number: body.number
+    }
+    Person.findByIdAndUpdate(id, updatedPerson, 
+        {new: true, runValidators: true, context: 'query'}
+    )
+        .then(result => response.json(result))
+        .catch(error => next(error))
 })
 
-app.delete("/api/persons/:id", (request, response, next) => {
-  const id = request.params.id
-  // persons = persons.filter(p => p.id !== id)
-  Person.findByIdAndDelete(id)
-    .then(result => response.status(204).end())
-    .catch(error => next(error))
-  // response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+    // persons = persons.filter(p => p.id !== id)
+    Person.findByIdAndDelete(id)
+        .then(_result => response.status(204).end())
+        .catch(error => next(error))
+    // response.status(204).end()
 })
 
 app.use(unknownEndpoint)
 
-const errorHandler = (error, request, response, next) => {
-  console.log("error name: ", error.name)
-  console.log("error message: ", error.message)
-  if (error.name === "CastError") {
-    response.status(400).send({
-      "message": "invalid id"
-    })
-  }else if (error.name === 'ValidationError') {
-    response.status(400).send({
-      "message": error.message
-    })
-  }
-  next(error)
+const errorHandler = (error, _request, response, next) => {
+    console.log('error name: ', error.name)
+    console.log('error message: ', error.message)
+    if (error.name === 'CastError') {
+        response.status(400).send({
+            'message': 'invalid id'
+        })
+    }else if (error.name === 'ValidationError') {
+        response.status(400).send({
+            'message': error.message
+        })
+    }
+    next(error)
 }
 
 app.use(errorHandler)
