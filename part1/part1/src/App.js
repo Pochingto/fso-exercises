@@ -9,7 +9,7 @@ const Button = ({handleClick, text}) => {
 }
 
 const History = ({allClicks}) => {
-  if (allClicks.length == 0) {
+  if (allClicks.length === 0) {
     return <div> this app works by pressing the button</div>
   }else {
     return <div> {allClicks.join(" ")} </div>
