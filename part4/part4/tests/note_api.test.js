@@ -70,6 +70,48 @@ test('note without content is not added', async () => {
     expect(noteAtEnd).toHaveLength(helper.initialNotes.length)
 }, 100000)
 
+test('a specific note can be viewed', async () => {
+    const noteAtStart = await helper.noteInDb()
+    const noteToView = noteAtStart[0]
+    const response = await api
+        .get(`/api/notes/${noteToView.id}`)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+    expect(response.body).toEqual(noteToView)
+}, 100000)
+
+test('a note can be deleted', async () => {
+    const noteAtStart = await helper.noteInDb()
+    const noteToDelete = noteAtStart[0]
+    await api
+        .delete(`/api/notes/${noteToDelete.id}`)
+        .expect(204)
+
+    const noteAtEnd = await helper.noteInDb()
+    expect(noteAtEnd).toHaveLength(helper.initialNotes.length - 1)
+
+    const contents = noteAtEnd.map(note => note.content)
+    expect(contents).not.toContain(noteToDelete.content)
+}, 100000)
+
+test('a note can be updated', async () => {
+    const noteAtStart = await helper.noteInDb()
+    const noteToUpdate = noteAtStart[0]
+    const newNote = {
+        content: 'this note is updated',
+        important: true,
+    }
+    const updatedNote = await api
+        .put(`/api/notes/${noteToUpdate.id}`)
+        .send(newNote)
+        .expect(200)
+
+    const noteAtEnd = await helper.noteInDb()
+    expect(noteAtEnd).toHaveLength(helper.initialNotes.length)
+
+    expect(updatedNote.body.content).toEqual(newNote.content)
+}, 100000)
+
 afterAll(async () => {
     await mongoose.connection.close()
 })
