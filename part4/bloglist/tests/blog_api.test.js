@@ -139,6 +139,24 @@ describe('API posting', () => {
     }, 100000)
 })
 
+describe('API deleting', () => {
+    test('successfully with valid id', async () => {
+        const blogsBefore = await api
+            .get('/api/blogs')
+            .expect(200)
+        const blogToDelete = blogsBefore.body[0]
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+        const blogsAfter = await api
+            .get('/api/blogs')
+            .expect(200)
+
+        expect(blogsAfter.body).toHaveLength(blogsBefore.body.length - 1)
+        expect(blogsAfter.body).not.toContainEqual(blogToDelete)
+    }, 100000)
+})
+
 afterAll( () => {
     mongoose.connection.close()
 })
