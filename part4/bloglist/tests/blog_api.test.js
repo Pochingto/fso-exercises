@@ -83,6 +83,26 @@ describe('API posting', () => {
         const titles = blogsAfter.body.map(blog => blog.title)
         expect(titles).toContain(newBlog.title)
     }, 100000)
+
+    test('successful added with property "likes" missing -> default to 0', async () => {
+        const newBlog = {
+            title: 'missingLikesBlog',
+            author: 'missingLikesAuthor',
+            url: 'missingLikesAuthor'
+        }
+
+        await api
+            .post('/api/blogs/')
+            .send(newBlog)
+            .expect(201)
+
+        const blogsAfter = await api
+            .get('/api/blogs')
+            .expect(200)
+        expect(blogsAfter.body).toHaveLength(initalBlogs.length + 1)
+        const blogAdded = blogsAfter.body.find(blog => blog.title === newBlog.title)
+        expect(blogAdded.likes).toBe(0)
+    }, 100000)
 })
 
 afterAll( () => {
