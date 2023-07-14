@@ -8,18 +8,30 @@ blogRouter.get('/', async (request, response) => {
 })
 
 blogRouter.post('/', async (request, response) => {
-    const blog = new Blog(request.body)
-    if (!blog.title || !blog.url) {
+    if (!request.body.title || !request.body.url) {
         response.status(400).end()
         return
     }
-
-    if (!blog.likes) {
-        blog.likes = 0
+    if (!request.body.likes) {
+        request.body.likes = 0
     }
 
+    const blog = new Blog(request.body)
     const result = await(blog.save())
     response.status(201).json(result)
+})
+
+blogRouter.put('/:id', async (request, response) => {
+    if (!request.body.title || !request.body.url) {
+        response.status(400).end()
+        return
+    }
+    if (!request.body.likes) {
+        request.body.likes = 0
+    }
+
+    const udpatedBlog = await(Blog.findByIdAndUpdate(request.params.id, request.body, { new: true }))
+    response.json(udpatedBlog)
 })
 
 blogRouter.delete('/:id', async (request, response) => {

@@ -157,6 +157,34 @@ describe('API deleting', () => {
     }, 100000)
 })
 
+describe('API updating', () => {
+    test('successfully with valid id', async () => {
+        const blogsBefore = await api
+            .get('/api/blogs')
+            .expect(200)
+        const blogToUpdate = blogsBefore.body[0]
+        const updatingBlog = {
+            title: 'updatingBlog1',
+            author: 'updatingAuthor1',
+            url: 'updatingUrl1',
+            likes: 1234
+        }
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatingBlog)
+            .expect(200)
+
+        const blogsAfter = await api
+            .get('/api/blogs')
+            .expect(200)
+
+        expect(blogsAfter.body).toHaveLength(blogsBefore.body.length)
+        expect(blogsAfter.body).not.toContainEqual(blogToUpdate)
+        const titles = blogsAfter.body.map(blog => blog.title)
+        expect(titles).toContain(updatingBlog.title)
+    }, 100000)
+})
+
 afterAll( () => {
     mongoose.connection.close()
 })
