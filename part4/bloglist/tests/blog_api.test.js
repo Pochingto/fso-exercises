@@ -103,6 +103,40 @@ describe('API posting', () => {
         const blogAdded = blogsAfter.body.find(blog => blog.title === newBlog.title)
         expect(blogAdded.likes).toBe(0)
     }, 100000)
+
+    test('failed with status code 400 when request body "title" missing', async () => {
+        const newBlog = {
+            author: 'missingTitle',
+            url: 'missing Title',
+            likes: 0
+        }
+        await api
+            .post('/api/blogs/')
+            .send(newBlog)
+            .expect(400)
+
+        const blogsAfter = await api
+            .get('/api/blogs')
+            .expect(200)
+        expect(blogsAfter.body).toHaveLength(initalBlogs.length)
+    }, 100000)
+
+    test('failed with status code 400 when request body "url" missing', async () => {
+        const newBlog = {
+            title: 'missingURL',
+            author: 'missingURL',
+            likes: 0
+        }
+        await api
+            .post('/api/blogs/')
+            .send(newBlog)
+            .expect(400)
+
+        const blogsAfter = await api
+            .get('/api/blogs')
+            .expect(200)
+        expect(blogsAfter.body).toHaveLength(initalBlogs.length)
+    }, 100000)
 })
 
 afterAll( () => {
