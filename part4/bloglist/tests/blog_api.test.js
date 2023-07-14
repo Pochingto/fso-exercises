@@ -52,7 +52,37 @@ describe('API getting', () => {
             .get('/api/blogs')
             .expect(200)
         expect(blogs.body).toHaveLength(initalBlogs.length)
-    })
+    }, 100000)
+
+    test('blog object has well-defined property id', async () => {
+        const blogs = await api
+            .get('/api/blogs')
+            .expect(200)
+        expect(blogs.body[0].id).toBeDefined()
+    }, 100000)
+})
+
+describe('API posting', () => {
+    test('successful with valid data', async () => {
+        const newBlog = {
+            title: 'newBlog',
+            author: 'newAuthor',
+            url: 'newURL',
+            likes: 12345
+        }
+
+        await api
+            .post('/api/blogs/')
+            .send(newBlog)
+            .expect(201)
+
+        const blogsAfter = await api
+            .get('/api/blogs')
+            .expect(200)
+        expect(blogsAfter.body).toHaveLength(initalBlogs.length + 1)
+        const titles = blogsAfter.body.map(blog => blog.title)
+        expect(titles).toContain(newBlog.title)
+    }, 100000)
 })
 
 afterAll( () => {
