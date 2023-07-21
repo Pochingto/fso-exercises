@@ -11,19 +11,11 @@ blogRouter.get('/', async (request, response) => {
     response.json(blogs)
 })
 
-const getTokenFrom = (request) => {
-    const authorization = request.get('authorization')
-    if (authorization.startsWith('Bearer ')) {
-        return authorization.replace('Bearer ', '')
-    }
-    return null
-}
-
 blogRouter.post('/', async (request, response) => {
     if (!request.body.title || !request.body.url) {
         return response.status(400).send('request must contain title or url')
     }
-    const token = getTokenFrom(request)
+    const token = request.token
     if (!token) {
         return response.status(401).send('unauthorized')
     }
