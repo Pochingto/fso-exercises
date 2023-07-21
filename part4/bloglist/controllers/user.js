@@ -1,10 +1,15 @@
 const userRouter = require('express').Router()
-const { default: mongoose } = require('mongoose')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 
 userRouter.get('/', async (request, response) => {
-    const results = await User.find({})
+    const results = await User
+        .find({})
+        .populate('blogs', {
+            title: 1,
+            author: 1,
+            url: 1
+        })
     return response.status(200).json(results)
 })
 
