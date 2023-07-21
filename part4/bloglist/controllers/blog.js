@@ -1,4 +1,5 @@
 const blogRouter = require('express').Router()
+const jwt = require('jsonwebtoken')
 const blog = require('../models/blog')
 const Blog = require('../models/blog')
 const User = require('../models/user')
@@ -10,18 +11,36 @@ blogRouter.get('/', async (request, response) => {
     response.json(blogs)
 })
 
+const getTokenFrom = (request) => {
+    const authorization = request.get('authorization')
+    if (authorization.startsWith('Bearer ')) {
+        return authorization.replace('Bearer ', '')
+    }
+    return null
+}
+
 blogRouter.post('/', async (request, response) => {
     if (!request.body.title || !request.body.url) {
-        response.status(400).end()
-        return
+        return response.status(400).send('request must contain title or url')
     }
-    if (!request.body.likes) {
-        request.body.likes = 0
+    const token = getTokenFrom(request)
+    if (!token) {
+        return response.status(401).send('unauthorized')
     }
-    const user = await User.findOne({})
-    request.body.user = user._id
 
-    const blog = new Blog(request.body)
+    const blogToCreate = request.body
+    const decodedUser = jwt.verify(token, process.env.SECRET)
+    if (!decodedUser.id) {
+        return response.status(401).send('invalid token!')
+    }
+
+    const user = await User.findById(decodedUser.id)
+    blogToCreate.user = user._id
+    if (!blogToCreate.likes) {
+        blogToCreate.likes = 0
+    }
+
+    const blog = new Blog(blogToCreate)
     const result = await(blog.save())
     response.status(201).json(result)
 })
