@@ -33,8 +33,11 @@ blogRouter.post('/', async (request, response) => {
     }
 
     const blog = new Blog(blogToCreate)
-    const result = await(blog.save())
-    response.status(201).json(result)
+    const savedBlog = await(blog.save())
+
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
+    response.status(201).json(savedBlog)
 })
 
 blogRouter.put('/:id', async (request, response) => {
@@ -51,7 +54,24 @@ blogRouter.put('/:id', async (request, response) => {
 })
 
 blogRouter.delete('/:id', async (request, response) => {
-    await blog.findByIdAndDelete(request.params.id)
+    const token = request.token
+    if (!token) {
+        return response.status(401).send('unauthorized token')
+    }
+    const decodedUser = jwt.verify(token, process.env.SECRET)
+    if (!decodedUser.id) {
+        return response.status(401).send('invalid token!')
+    }
+    const user = await User.findById(decodedUser.id)
+    const blogToDelete = await Blog.findById(request.params.id)
+    if (!blogToDelete || !user) {
+        return response.status(400).send('invalid blog id or token')
+    }
+    if (blogToDelete.user.toString() !== user._id.toString()) {
+        return response.status(401).send('unauthorized user')
+    }
+
+    await blog.findByIdAndDelete(blogToDelete._id)
     response.status(204).end()
 })
 
