@@ -1,14 +1,17 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 mongoose.set('bufferTimeoutMS', 30000)
 
 const config = require('../utils/config')
 const supertest = require('supertest')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const app = require('../app')
 
 const api = supertest(app)
 
-const initalBlogs = [
+let initalBlogs = [
     {
         title: 'blog1',
         author: 'author1',
@@ -34,10 +37,46 @@ const initalBlogs = [
         likes: 14400
     }
 ]
+let token = null
+let userId = null
 
 beforeEach( async () => {
+    await User.deleteMany({})
     await Blog.deleteMany({})
-    await Blog.insertMany(initalBlogs)
+
+    const password = 'mypassword123'
+    const passwordHash = await bcrypt.hash(password, 10)
+    const userToCreate = new User({
+        username: 'root',
+        name: 'test',
+        passwordHash: passwordHash
+    })
+    const savedUser = await userToCreate.save()
+    userId = savedUser._id
+
+    const loginResponse = await api
+        .post('/api/login')
+        .send({
+            username: 'root',
+            password: password
+        })
+        .expect(200)
+
+    token = loginResponse.body.token
+
+    initalBlogs.forEach(blog => {
+        blog.user = userId
+    })
+
+    // console.log(initalBlogs)
+    const savedBlogs = await Blog.insertMany(initalBlogs)
+    // console.log(savedBlogs)
+    const blogsId = savedBlogs.map(blog => blog._id)
+    const user = await User.findById(userId)
+    user.blogs = user.blogs.concat(blogsId)
+    await user.save()
+    // console.log(loginResponse.body)
+    // console.log(token)
 }, 100000)
 
 describe('API Testing environment', () => {
@@ -50,6 +89,7 @@ describe('API getting', () => {
     test('all blogs return correct number of blogs', async () => {
         const blogs = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
         expect(blogs.body).toHaveLength(initalBlogs.length)
     }, 100000)
@@ -57,6 +97,7 @@ describe('API getting', () => {
     test('blog object has well-defined property id', async () => {
         const blogs = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
         expect(blogs.body[0].id).toBeDefined()
     }, 100000)
@@ -74,10 +115,12 @@ describe('API posting', () => {
         await api
             .post('/api/blogs/')
             .send(newBlog)
+            .set('Authorization', `Bearer ${token}`)
             .expect(201)
 
         const blogsAfter = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
         expect(blogsAfter.body).toHaveLength(initalBlogs.length + 1)
         const titles = blogsAfter.body.map(blog => blog.title)
@@ -94,10 +137,12 @@ describe('API posting', () => {
         await api
             .post('/api/blogs/')
             .send(newBlog)
+            .set('Authorization', `Bearer ${token}`)
             .expect(201)
 
         const blogsAfter = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
         expect(blogsAfter.body).toHaveLength(initalBlogs.length + 1)
         const blogAdded = blogsAfter.body.find(blog => blog.title === newBlog.title)
@@ -112,11 +157,13 @@ describe('API posting', () => {
         }
         await api
             .post('/api/blogs/')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlog)
             .expect(400)
 
         const blogsAfter = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
         expect(blogsAfter.body).toHaveLength(initalBlogs.length)
     }, 100000)
@@ -129,31 +176,40 @@ describe('API posting', () => {
         }
         await api
             .post('/api/blogs/')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlog)
             .expect(400)
 
         const blogsAfter = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
         expect(blogsAfter.body).toHaveLength(initalBlogs.length)
     }, 100000)
 })
 
 describe('API deleting', () => {
-    test('successfully with valid id', async () => {
+    test('successfully with valid id and valid user', async () => {
         const blogsBefore = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
-        const blogToDelete = blogsBefore.body[0]
+
+        const user = await User.findById(userId)
+        const blogIdToDelete = user.blogs[0]
+
         await api
-            .delete(`/api/blogs/${blogToDelete.id}`)
+            .delete(`/api/blogs/${blogIdToDelete}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(204)
         const blogsAfter = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
 
         expect(blogsAfter.body).toHaveLength(blogsBefore.body.length - 1)
-        expect(blogsAfter.body).not.toContainEqual(blogToDelete)
+        const blogIds = blogsAfter.body.map(blog => blog.id)
+        expect(blogIds).not.toContainEqual(blogIdToDelete)
     }, 100000)
 })
 
@@ -161,8 +217,13 @@ describe('API updating', () => {
     test('successfully with valid id', async () => {
         const blogsBefore = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
-        const blogToUpdate = blogsBefore.body[0]
+
+        const user = await User.findById(userId)
+        const blogIdToUpdate = user.blogs[0]
+        const blogToUpdate = await Blog.findById(blogIdToUpdate)
+
         const updatingBlog = {
             title: 'updatingBlog1',
             author: 'updatingAuthor1',
@@ -170,12 +231,14 @@ describe('API updating', () => {
             likes: 1234
         }
         await api
-            .put(`/api/blogs/${blogToUpdate.id}`)
+            .put(`/api/blogs/${blogIdToUpdate}`)
             .send(updatingBlog)
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
 
         const blogsAfter = await api
             .get('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
 
         expect(blogsAfter.body).toHaveLength(blogsBefore.body.length)
