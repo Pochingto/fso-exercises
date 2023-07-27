@@ -1,10 +1,10 @@
 import Note from './components/Note'
 import LoginForm from './components/Login'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import noteService from './services/notes'
 import loginService from './services/login'
-import login from './services/login'
+import Togglable from './components/Togglable'
+import NoteForm from './components/Noteform'
 
 const Footer = () => {
   const footerStyle = {
@@ -35,14 +35,12 @@ const Notification = ({message}) => {
 
 const App = () => {
   const [notes, setNotes] = useState(null)
-  const [newNote, setNewNote] = useState("add new note...")
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
 
   const [userName, setUserName] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [loginVisible, setLoginVisible] = useState(false)
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -66,7 +64,9 @@ const App = () => {
 
  const hook = () => {
     console.log('effect')
-    noteService.getAll().then(notes => setNotes(notes))
+    noteService.getAll()
+      .then(notes => setNotes(notes))
+      .catch(error => console.log(error.message))
   }
   useEffect(hook, [])
   useEffect(() => {
@@ -78,27 +78,18 @@ const App = () => {
     }
   }, [])
   // console.log('render', notes.length, 'notes')
-  
-  const addNote = (event) => {
-    event.preventDefault()
-    console.log("clicked...", event.target)
-
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5
+  const createNote = async (noteObject) => {
+    try {
+      const note = await noteService.create(noteObject)
+      console.log(note)
+      setNotes(notes.concat(note))
+    } catch (error) {
+      console.log("caugth by frontend")
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000);
     }
-    noteService.create(noteObject)
-      .then((note) => {
-        console.log(note)
-        setNotes(notes.concat(note))
-      }).catch(error => {
-        console.log("caugth by frontend")
-        setErrorMessage(error.response.data.error)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000);
-      })
-    setNewNote('')
   }
   const toggleImportanceOf = (id) => {
     console.log(`toggling ${id} importance`)
@@ -119,10 +110,6 @@ const App = () => {
         setNotes(notes.filter(note => note.id !== id))
       })
   }
-  const handleNoteChange = (event) => {
-    // console.log(event.target.value)
-    setNewNote(event.target.value)
-  }
 
   if (!notes)
     return null
@@ -130,14 +117,8 @@ const App = () => {
   const noteToShow = showAll ? notes : notes.filter(note => note.important)
 
   const loginForm = () => {
-    const hideWhenVisible = {display: loginVisible ? 'none': ''}
-    const showWhenVisible = {display: loginVisible ? '': 'none'}
-
-    return (<div>
-      <div style={hideWhenVisible}>
-        <button onClick={() => setLoginVisible(true)}>log in</button>
-      </div>
-      <div style={showWhenVisible}>
+    return (
+      <Togglable buttonLabel='login'>
         <LoginForm 
           username={userName}
           password={password}
@@ -145,16 +126,12 @@ const App = () => {
           handleUserNameChange={(event) => setUserName(event.target.value)}
           handlePasswordChange={(event) => setPassword(event.target.value)}
         />
-        <button onClick={() => setLoginVisible(false)}>cancel</button>
-      </div>
-    </div>)
+      </Togglable>
+    )
   }
 
   const noteForm = () => (
-    <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange}/>
-        <button type='submit'> save </button>
-    </form>
+    <NoteForm createNote={createNote} />
   )
 
   return (
