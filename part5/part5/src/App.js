@@ -1,6 +1,6 @@
 import Note from './components/Note'
 import LoginForm from './components/Login'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import noteService from './services/notes'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
@@ -78,19 +78,6 @@ const App = () => {
     }
   }, [])
   // console.log('render', notes.length, 'notes')
-  const createNote = async (noteObject) => {
-    try {
-      const note = await noteService.create(noteObject)
-      console.log(note)
-      setNotes(notes.concat(note))
-    } catch (error) {
-      console.log("caugth by frontend")
-      setErrorMessage(error.response.data.error)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000);
-    }
-  }
   const toggleImportanceOf = (id) => {
     console.log(`toggling ${id} importance`)
     const note = notes.find( (note) => note.id === id)
@@ -111,9 +98,6 @@ const App = () => {
       })
   }
 
-  if (!notes)
-    return null
-
   const noteToShow = showAll ? notes : notes.filter(note => note.important)
 
   const loginForm = () => {
@@ -130,10 +114,30 @@ const App = () => {
     )
   }
 
+  const noteFormRef = useRef()
+  const createNote = async (noteObject) => {
+    try {
+      const note = await noteService.create(noteObject)
+      console.log(note)
+      noteFormRef.current.toggleVisibility()
+      setNotes(notes.concat(note))
+    } catch (error) {
+      console.log("caugth by frontend")
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000);
+    }
+  }
   const noteForm = () => (
-    <NoteForm createNote={createNote} />
+    <Togglable buttonLabel='create new note' ref={noteFormRef}>
+      <NoteForm createNote={createNote} />
+    </Togglable>
   )
 
+  if (!notes) {
+    return null
+  }
   return (
     <div>
       <h1>Notes</h1>

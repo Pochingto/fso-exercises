@@ -30,7 +30,7 @@ const create = async (objectToCreate) => {
 const update = (updatedNote, id) => {
     return axios
         .put(baseURL + `${id}`, updatedNote)
-        .then(resposne => resposne.data)
+        .then(response => response.data)
 }
 
 export default {getAll, create, update, setToken}
