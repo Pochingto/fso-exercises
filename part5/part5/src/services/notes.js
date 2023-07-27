@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseURL = "/api/notes/"
+const baseURL = '/api/notes/'
 
 let token = null
 
@@ -14,13 +14,13 @@ const getAll = () => {
         important: true,
     }
     return axios
-      .get(baseURL)
-      .then(response => response.data.concat(nonExisting))
+        .get(baseURL)
+        .then(response => response.data.concat(nonExisting))
 }
 
 const create = async (objectToCreate) => {
     const config = {
-        headers: {'Authorization': token}
+        headers: { 'Authorization': token }
     }
     const response = await axios.post(baseURL, objectToCreate, config)
     console.log(response)
@@ -33,4 +33,4 @@ const update = (updatedNote, id) => {
         .then(response => response.data)
 }
 
-export default {getAll, create, update, setToken}
+export default { getAll, create, update, setToken }
