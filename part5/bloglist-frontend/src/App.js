@@ -1,19 +1,42 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import LoginForm from './components/Login'
 import blogService from './services/blogs'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    if (window.localStorage.getItem('user')) {
+      const savedUser = JSON.parse(window.localStorage.getItem('user'))
+      if (savedUser){
+        console.log('saved user: ', savedUser)
+        setUser(savedUser)
+        blogService.setToken(savedUser.token)
+      }
+    }
   }, [])
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+    blogService.setToken(user.token)
+    console.log('reset user...')
+    console.log('blogs: ', blogs)
+    blogService.getAll().then(blogs => {
+        console.log('getAll blogs...', blogs)
+        setBlogs( blogs )
+      }
+    )
+    .catch(error => console.log(error.message))
+    window.localStorage.setItem('user', JSON.stringify(user))
+  }, [user])
 
   return (
     <div>
       <h2>blogs</h2>
+      {user === null && <LoginForm setUser={setUser} />}
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
