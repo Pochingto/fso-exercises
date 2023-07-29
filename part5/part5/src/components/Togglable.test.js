@@ -1,8 +1,8 @@
-import React from "react"
+import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import { screen, render } from "@testing-library/react"
+import { screen, render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import Togglable from "./Togglable"
+import Togglable from './Togglable'
 
 describe('<Togglable />', () => {
     let container
