@@ -28,16 +28,26 @@ describe('Note app', function() {
         cy.contains('Ricky Cheng')
     })
 
+    it('login fails with wrong password', function() {
+      cy.contains('login').click()
+      cy.get('#username').type('pochingto')
+      cy.get('#password').type('wrongpassword')
+
+      cy.get('#login-button').click()
+      cy.get('.error')
+        .should('contain', 'wrong credentials')
+        .and('have.css', 'color', 'rgb(255, 0, 0)')
+        .and('have.css', 'border-style', 'solid')
+    })
+
     describe('when logged in', function() {
       beforeEach(function() {
-        cy.contains('login').click()
-        cy.get('#username').type('pochingto')
-        cy.get('#password').type('mypassword123')
-
-        cy.get('#login-button').click()
-        cy.contains('Ricky Cheng')
+        cy.login({
+          username: 'pochingto', 
+          password: 'mypassword123'
+        })
       })
-      it('a new note can be created', function() {
+      it.only('a new note can be created', function() {
         const newNoteContent = 'a note can be created by cypress'
         cy.contains('create new note').click()
         cy.get('#newNoteInput').type(newNoteContent)
