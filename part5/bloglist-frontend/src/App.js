@@ -4,8 +4,23 @@ import LoginForm from './components/Login'
 import BlogForm from './components/Blogform'
 import blogService from './services/blogs'
 
+const Notification = ({notification}) => {
+  console.log('noti: ', notification)
+  const style = {
+      color: 'green',
+      background: 'lightgrey',
+      fontSize: '20px',
+      borderStyle: 'solid',
+      borderRadius: '5px',
+      padding: '10px',
+      marginBottom: '10px',
+  }
+  return (<p style={style} id='notification'>{notification}</p>)
+}
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [notification, setNotification] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -47,10 +62,11 @@ const App = () => {
 
   return (
     <div>
+      {notification !== '' && <Notification notification={notification}/> }
       <h2>blogs</h2>
       {user === null && <LoginForm setUser={setUser} />}
       {user !== null && greeting(handleLogOut)}
-      {user !== null && <BlogForm blogs={blogs} setBlogs={setBlogs}/>}
+      {user !== null && <BlogForm blogs={blogs} setBlogs={setBlogs} setNotification={setNotification}/>}
       {user !== null && blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
