@@ -21,5 +21,16 @@ const getAll = () => {
     .catch(error => console.error(error.response.data))
 }
 
+const createNewBlog = (blog) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+
+  return axios
+    .post(baseUrl, blog, config)
+    .then(response => response.data)
+    .catch(error => console.error(error.response.data))
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { setToken, getAll }
+export default { setToken, getAll, createNewBlog}
