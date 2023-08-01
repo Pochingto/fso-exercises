@@ -41,6 +41,15 @@ blogRouter.put('/:id', async (request, response) => {
     response.json(udpatedBlog)
 })
 
+blogRouter.delete('/', async (request, response) => {
+    const user = request.user
+    if (!user) {
+        return response.status(400).send('invalid blog id or token')
+    }
+    await blog.deleteMany({})
+    response.status(204).end()
+})
+
 blogRouter.delete('/:id', async (request, response) => {
     const user = request.user
     const blogToDelete = await Blog.findById(request.params.id)
