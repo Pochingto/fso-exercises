@@ -19,6 +19,14 @@ describe('Note app', function() {
         cy.contains('login').click()
     })
 
+    it('then example', function() {
+      cy.get('button').then( buttons => {
+        console.log('number of buttons', buttons.length)
+        cy.wrap(buttons[0]).click()
+      })
+      // debugger
+    })
+
     it('user can login', function() {
         cy.contains('login').click()
         cy.get('#username').type('pochingto')
@@ -55,17 +63,17 @@ describe('Note app', function() {
         cy.contains(newNoteContent)
       })
 
-      describe('and when a note exist', function() {
+      describe('and when some note exist', function() {
         beforeEach(function() {
-          cy.createNote({
-            content: 'another note cypress',
-            important: true
-          })
+          cy.createNote({ content: 'first note cypress', important: true })
+          cy.createNote({ content: 'second note cypress', important: true })
+          cy.createNote({ content: 'third note cypress', important: true })
         })
 
-        it('it can be made not important', function () {
-          cy.contains('another note cypress').contains('make not important').click()
-          cy.contains('another note cypress').contains('make important')
+        it('one of these can be made not important', function () {
+          cy.contains('second note cypress').parent().find('button').click()
+          cy.contains('second note cypress').parent().find('button')
+            .should('contain', 'make important')
         })
       })
     })
