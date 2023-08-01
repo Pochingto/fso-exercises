@@ -1,13 +1,13 @@
 describe('Note app', function() {
     beforeEach(function() {
-      cy.request('POST', 'http://localhost:3001/api/testing/reset')
+      cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
       const user = {
         username: 'pochingto',
         password: 'mypassword123',
         name: 'Ricky Cheng'
       }
-      cy.request('POST', 'http://localhost:3001/api/users', user)
-      cy.visit('http://localhost:3000')
+      cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
+      cy.visit('')
     })
 
     it('front page can be opened', function() {
@@ -47,7 +47,7 @@ describe('Note app', function() {
           password: 'mypassword123'
         })
       })
-      it.only('a new note can be created', function() {
+      it('a new note can be created', function() {
         const newNoteContent = 'a note can be created by cypress'
         cy.contains('create new note').click()
         cy.get('#newNoteInput').type(newNoteContent)
@@ -57,11 +57,10 @@ describe('Note app', function() {
 
       describe('and when a note exist', function() {
         beforeEach(function() {
-          const newNoteContent = 'another note cypress'
-          cy.contains('create new note').click()
-          cy.get('#newNoteInput').type(newNoteContent)
-          cy.get('#saveNewNoteButton').click()
-          cy.contains(newNoteContent)
+          cy.createNote({
+            content: 'another note cypress',
+            important: true
+          })
         })
 
         it('it can be made not important', function () {
