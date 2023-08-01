@@ -33,11 +33,23 @@ const App = () => {
     window.localStorage.setItem('user', JSON.stringify(user))
   }, [user])
 
+  const handleLogOut = (event) => {
+    window.localStorage.removeItem('user')
+    setUser(null)
+  }
+
+  const greeting = (handleLogOut) => {
+    return (
+      <span>{user.name} <button onClick={handleLogOut}>log out</button></span>
+    )
+  }
+
   return (
     <div>
       <h2>blogs</h2>
       {user === null && <LoginForm setUser={setUser} />}
-      {blogs.map(blog =>
+      {user !== null && greeting(handleLogOut)}
+      {user !== null && blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
     </div>
