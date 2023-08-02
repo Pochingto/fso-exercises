@@ -18,9 +18,24 @@ const Notification = ({notification}) => {
   return (<p style={style} id='notification'>{notification}</p>)
 }
 
+const ErrorMessage = ({errorMessage}) => {
+  console.log('errorMessage: ', errorMessage)
+  const style = {
+      color: 'red',
+      background: 'lightgrey',
+      fontSize: '20px',
+      borderStyle: 'solid',
+      borderRadius: '5px',
+      padding: '10px',
+      marginBottom: '10px',
+  }
+  return (<p style={style} id='errorMessage'>{errorMessage}</p>)
+}
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notification, setNotification] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -62,11 +77,12 @@ const App = () => {
 
   return (
     <div>
+      {errorMessage !== '' && <ErrorMessage errorMessage={errorMessage}/>}
       {notification !== '' && <Notification notification={notification}/> }
       <h2>blogs</h2>
-      {user === null && <LoginForm setUser={setUser} />}
+      {user === null && <LoginForm setUser={setUser} setNotification={setNotification} setErrorMessage={setErrorMessage}/>}
       {user !== null && greeting(handleLogOut)}
-      {user !== null && <BlogForm blogs={blogs} setBlogs={setBlogs} setNotification={setNotification}/>}
+      {user !== null && <BlogForm blogs={blogs} setBlogs={setBlogs} setErrorMessage={setErrorMessage}/>}
       {user !== null && blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}

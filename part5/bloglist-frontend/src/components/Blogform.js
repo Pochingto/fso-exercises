@@ -1,7 +1,7 @@
 import { useState } from "react"
 import blogService from '../services/blogs'
 
-const BlogForm = ({blogs, setBlogs, setNotification}) => {
+const BlogForm = ({blogs, setBlogs, setNotification, setErrorMessage}) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
@@ -21,7 +21,11 @@ const BlogForm = ({blogs, setBlogs, setNotification}) => {
                 setNotification(`a new blog ${title} by ${author} added`)
                 setTimeout(() => setNotification(''), 5000)
             })
-            .catch(error => console.error(error))
+            .catch(error => {
+                if (error.response && error.response.data) setErrorMessage(error.response.data)
+                else setErrorMessage(error.message)
+                setTimeout(() => setErrorMessage(''), 5000)
+            })
     }
     return (
         <form onSubmit={handleCreateBlog}>

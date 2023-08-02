@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import loginService from '../services/login'
 
-const LoginForm = ({setUser}) => {
+const LoginForm = ({setUser, setErrorMessage}) => {
     
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -12,6 +12,11 @@ const LoginForm = ({setUser}) => {
             username: username, 
             password: password
         }).then(user => setUser(user))
+        .catch(error => {
+            console.log(error)
+            setErrorMessage(error.response.data)
+            setTimeout(() => setErrorMessage(''), 5000)
+        })
     }
     return (
         <div>
