@@ -30,14 +30,14 @@ const createNewBlog = (blog) => {
     .then(response => response.data)
 }
 
-const updateBlog = (blog) => {
+const updateBlog = (blogId, body) => {
   const config = {
     headers: { Authorization: token }
   }
 
-  const blogUrl = baseUrl + `/${blog.id}`
+  const blogUrl = baseUrl + `/${blogId}`
   return axios
-    .put(blogUrl, blog, config)
+    .put(blogUrl, body, config)
     .then(response => response.data)
 }
 

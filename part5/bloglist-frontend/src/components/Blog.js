@@ -14,12 +14,12 @@ const Blog = ({blog}) => {
   const toggleShowDetails = () => setShowDetails(!showDetails)
 
   const addLikes = (event) => {
-    const blogToUpdate = blog
-    blogToUpdate.likes = blog.likes + 1
-    blogToUpdate.likes = 
-    console.log('try update blog from Blog: ', blog)
+    event.preventDefault()
+    const body = {
+      likes: blogLikes + 1
+    }
     blogService
-      .updateBlog(blog)
+      .updateBlog(blog.id, body)
       .then(response => {
         console.log('updated blog: ', response)
         setBlogLikes(blogLikes + 1)
@@ -32,7 +32,7 @@ const Blog = ({blog}) => {
       <button onClick={toggleShowDetails}>{showDetails ? 'hide': 'view'}</button>
       <div style={{display: showDetails ? '': 'none'}}>
         url: {blog.url}<br/>
-        likes: {blog.likes} <button onClick={addLikes}>likes</button><br/>
+        likes: {blogLikes} <button onClick={addLikes}>likes</button><br/>
         user: {blog.user.name}<br/>
       </div>
   </div>)
