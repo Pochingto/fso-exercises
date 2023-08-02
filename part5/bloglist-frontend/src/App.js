@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/Login'
 import BlogForm from './components/Blogform'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 
 const Notification = ({notification}) => {
@@ -80,9 +81,15 @@ const App = () => {
       {errorMessage !== '' && <ErrorMessage errorMessage={errorMessage}/>}
       {notification !== '' && <Notification notification={notification}/> }
       <h2>blogs</h2>
-      {user === null && <LoginForm setUser={setUser} setNotification={setNotification} setErrorMessage={setErrorMessage}/>}
+      {user === null && 
+        <LoginForm setUser={setUser} setNotification={setNotification} setErrorMessage={setErrorMessage}/>
+      }
       {user !== null && greeting(handleLogOut)}
-      {user !== null && <BlogForm blogs={blogs} setBlogs={setBlogs} setErrorMessage={setErrorMessage}/>}
+      {user !== null && 
+      <Togglable buttonLabel={'create blog'}>
+        <BlogForm blogs={blogs} setBlogs={setBlogs} setErrorMessage={setErrorMessage}/>
+      </Togglable>
+      }
       {user !== null && blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
