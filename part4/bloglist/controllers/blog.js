@@ -30,10 +30,10 @@ blogRouter.post('/', async (request, response) => {
 
 blogRouter.put('/:id', async (request, response) => {
     const user = request.user
-    if (!user) {
-        return response.status(400).send('invalid token')
-    }
     const blogToUpdate = await Blog.findById(request.params.id)
+    if (!blogToUpdate || !user) {
+        return response.status(400).send('invalid blog id or token')
+    }
     if (blogToUpdate.user.toString() !== user._id.toString()) {
         return response.status(401).send('unauthorized user')
     }
