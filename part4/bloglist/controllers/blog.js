@@ -29,22 +29,28 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.put('/:id', async (request, response) => {
-    if (!request.body.title || !request.body.url) {
-        response.status(400).end()
-        return
+    const user = request.user
+    if (!user) {
+        return response.status(400).send('invalid token')
     }
-    if (!request.body.likes) {
-        request.body.likes = 0
+    const blogToUpdate = await Blog.findById(request.params.id)
+    if (blogToUpdate.user.toString() !== user._id.toString()) {
+        return response.status(401).send('unauthorized user')
     }
 
-    const udpatedBlog = await(Blog.findByIdAndUpdate(request.params.id, request.body, { new: true }))
+    if (request.body.title) blogToUpdate.title = request.body.title
+    if (request.body.author) blogToUpdate.author = request.body.author
+    if (request.body.url) blogToUpdate.url = request.body.url
+    if (request.body.likes) blogToUpdate.likes = request.body.likes
+
+    const udpatedBlog = await blogToUpdate.save()
     response.json(udpatedBlog)
 })
 
 blogRouter.delete('/', async (request, response) => {
     const user = request.user
     if (!user) {
-        return response.status(400).send('invalid blog id or token')
+        return response.status(400).send('invalid token')
     }
     await blog.deleteMany({})
     response.status(204).end()
