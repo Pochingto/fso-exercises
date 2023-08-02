@@ -8,7 +8,6 @@ const Togglable = (props) => {
     return (
         <div>
             <div style={hideWhenVisable}>
-                {props.header}
                 <button onClick={() => setVisable(true)}>{props.buttonLabel}</button>
             </div>
             <div style={showWhenVisable}>

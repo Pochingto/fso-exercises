@@ -1,4 +1,4 @@
-import Togglable from "./Togglable"
+import { useState } from "react"
 
 const Blog = ({blog}) => {
   const blogStyle = {
@@ -8,14 +8,17 @@ const Blog = ({blog}) => {
     borderWidth: 1,
     marginBottom: 5
   }
+  const [showDetails, setShowDetails] = useState(false)
+  const toggleShowDetails = () => setShowDetails(!showDetails)
   return (
   <div style={blogStyle}>
-    <Togglable header={blog.title + ' ' + blog.author} buttonLabel={'view'}>
-      title: {blog.title}<br/>
-      url: {blog.url}<br/>
-      likes: {blog.likes} <button>likes</button><br/>
-      author: {blog.author}<br/>
-    </Togglable>
+      {blog.title}
+      <button onClick={toggleShowDetails}>{showDetails ? 'hide': 'view'}</button>
+      <div style={{display: showDetails ? '': 'none'}}>
+        url: {blog.url}<br/>
+        likes: {blog.likes} <button>likes</button><br/>
+        author: {blog.author}<br/>
+      </div>
   </div>)
 }
 
