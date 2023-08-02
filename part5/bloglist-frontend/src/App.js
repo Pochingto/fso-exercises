@@ -76,6 +76,8 @@ const App = () => {
     )
   }
 
+  // sort blogs
+  blogs.sort((a, b) => b.likes - a.likes)
   return (
     <div>
       {errorMessage !== '' && <ErrorMessage errorMessage={errorMessage}/>}
