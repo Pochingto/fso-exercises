@@ -20,6 +20,10 @@ const BlogForm = ({blogs, setBlogs, setNotification, setErrorMessage}) => {
                 setBlogs(blogs.concat(blog))
                 setNotification(`a new blog ${title} by ${author} added`)
                 setTimeout(() => setNotification(''), 5000)
+
+                setTitle('')
+                setAuthor('')
+                setUrl('')
             })
             .catch(error => {
                 if (error.response && error.response.data) setErrorMessage(error.response.data)
