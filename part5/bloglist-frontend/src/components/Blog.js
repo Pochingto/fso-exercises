@@ -12,12 +12,12 @@ const Blog = ({blog}) => {
   const toggleShowDetails = () => setShowDetails(!showDetails)
   return (
   <div style={blogStyle}>
-      {blog.title}
+      {blog.title} by {blog.author}
       <button onClick={toggleShowDetails}>{showDetails ? 'hide': 'view'}</button>
       <div style={{display: showDetails ? '': 'none'}}>
         url: {blog.url}<br/>
         likes: {blog.likes} <button>likes</button><br/>
-        author: {blog.author}<br/>
+        user: {blog.user.name}<br/>
       </div>
   </div>)
 }

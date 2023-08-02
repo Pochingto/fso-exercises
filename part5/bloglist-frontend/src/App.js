@@ -87,7 +87,7 @@ const App = () => {
       {user !== null && greeting(handleLogOut)}
       {user !== null && 
       <Togglable buttonLabel={'create blog'}>
-        <BlogForm blogs={blogs} setBlogs={setBlogs} setNotification={setNotification} setErrorMessage={setErrorMessage}/>
+        <BlogForm blogs={blogs} user={user} setBlogs={setBlogs} setNotification={setNotification} setErrorMessage={setErrorMessage}/>
       </Togglable>
       }
       {user !== null && blogs.map(blog =>

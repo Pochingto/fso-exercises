@@ -1,7 +1,7 @@
 import { useState } from "react"
 import blogService from '../services/blogs'
 
-const BlogForm = ({blogs, setBlogs, setNotification, setErrorMessage}) => {
+const BlogForm = ({blogs, user, setBlogs, setNotification, setErrorMessage}) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
@@ -16,6 +16,7 @@ const BlogForm = ({blogs, setBlogs, setNotification, setErrorMessage}) => {
         blogService
             .createNewBlog(newBlog)
             .then(blog => {
+                blog.user = user
                 console.log('created blog: ', blog)
                 setBlogs(blogs.concat(blog))
                 setNotification(`a new blog ${title} by ${author} added`)
