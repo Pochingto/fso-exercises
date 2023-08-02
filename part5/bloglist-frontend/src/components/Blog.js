@@ -1,7 +1,7 @@
 import { useState } from "react"
 import blogService from '../services/blogs'
 
-const Blog = ({blog}) => {
+const Blog = ({blog, setNotification}) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -26,6 +26,19 @@ const Blog = ({blog}) => {
       })
       .catch(error => console.error(error.message))
   }
+
+  const deleteBlog = (event) => {
+    const blogId = blog.id
+    if (window.confirm(`Remove ${blog.title} by ${blog.author} ?`)) {
+      blogService
+        .deleteBlog(blogId)
+        .then((response) => {
+          console.log('service response: ', response)
+          setNotification(`${blog.title} by ${blog.author} has been removed.`)
+          setTimeout(() => setNotification(''), 5000)
+        })
+    }
+  }
   return (
   <div style={blogStyle}>
       {blog.title} by {blog.author}
@@ -34,6 +47,7 @@ const Blog = ({blog}) => {
         url: {blog.url}<br/>
         likes: {blogLikes} <button onClick={addLikes}>likes</button><br/>
         user: {blog.user.name}<br/>
+        <button onClick={deleteBlog}>Remove</button>
       </div>
   </div>)
 }
